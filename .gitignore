@@ -28,6 +28,7 @@ ENV/
 env.bak/
 venv.bak/
 .conda/
+.env
 
 # IDE
 .vscode/
