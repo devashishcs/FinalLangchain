@@ -1,0 +1,87 @@
+ #Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.conda/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Vector databases and embeddings
+perfect_chroma_db/
+chroma_db/
+*.db
+*.sqlite3
+chromadb/
+embeddings/
+vectorstore/
+
+# Log files
+*.log
+logs/
+.logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Model files (if you download any)
+models/
+*.bin
+*.safetensors
+*.pt
+*.pth
+
+# Data files (adjust as needed)
+data/
+*.csv
+*.json
+*.pdf
+documents/
+
+# Cache
+.cache/
+*.cache

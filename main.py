@@ -13,7 +13,7 @@ load_dotenv()
 
 # Configuration
 PERSIST_DIR = "./perfect_chroma_db"
-
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 def setup_vectorstore():
     """Setup or load vector store"""
