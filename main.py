@@ -60,7 +60,12 @@ if the context provides enough information, answer the question.
     )
     
     result = qa.invoke({"input": query})
-    return result
+    new_result = {
+        "query": result["input"],
+        "result": result["answer"],
+        "source_documents": result["context"]
+    }
+    return new_result
 
 if __name__ == "__main__":
     # Setup vector store (run once)
