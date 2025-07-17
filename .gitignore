@@ -1,4 +1,4 @@
- #Python
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -48,6 +48,10 @@ chroma_db/
 chromadb/
 embeddings/
 vectorstore/
+
+# Specific folders to ignore
+perfect_chroma_db/
+upload_files/
 
 # Log files
 *.log
