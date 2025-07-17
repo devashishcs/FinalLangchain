@@ -1,5 +1,6 @@
 import streamlit as st
 from main import run_llm
+import requests
 
 # Full purple-themed CSS with enhanced sidebar styling
 st.markdown("""
@@ -239,12 +240,28 @@ if st.session_state["selected_menu"] == "Previous Chat":
     if prompt and (not st.session_state["user_prompt_history"] or prompt != st.session_state["user_prompt_history"][-1]):
         with st.spinner("✨ Generating Response..."):
             langchain_chat_history = [(r, c) for r, c in st.session_state["chat_history"]]
-            generated_response = run_llm(query=prompt, chat_history=langchain_chat_history)
+            # generated_response = run_llm(query=prompt, chat_history=langchain_chat_history)
+
+            api_url = "http://127.0.0.1:5000/api/query"  # Change to your actual API endpoint
+            payload = {
+                "query": prompt,
+                "chat_history": langchain_chat_history
+            }
+            try:
+                response = requests.post(api_url, json=payload)
+                response.raise_for_status()
+                generated_response = response.json()
+            except Exception as e:
+                generated_response = {
+                    "result": f"Error: {e}",
+                    "source_documents": []
+                }
 
             if not generated_response["source_documents"]:
                 formatted_response = f"{generated_response['result']}  \n\n_No source documents found._"
             else:
-                sources = set(doc.metadata["source"] for doc in generated_response["source_documents"])
+                
+                sources = set(doc["metadata"]["source"] for doc in generated_response["source_documents"])
                 formatted_response = f"{generated_response['result']}  \n\n**Sources:** {sources}"
 
             st.session_state["user_prompt_history"].append(prompt)

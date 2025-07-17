@@ -1,3 +1,48 @@
+from flask import Flask, request, jsonify
+from werkzeug.utils import secure_filename
+import threading
+
+app = Flask(__name__)
+UPLOAD_FOLDER = './upload_files'
+ALLOWED_EXTENSIONS = {'pdf'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/api/query', methods=['POST'])
+def api_query():
+    data = request.json
+    query = data.get('query')
+    chat_history = data.get('chat_history', [])
+    if not query:
+        return jsonify({'error': 'Query is required'}), 400
+    result = run_llm(query, chat_history)
+    # Serialize Document objects in source_documents
+    def serialize_document(doc):
+        return {
+            'page_content': getattr(doc, 'page_content', str(doc)),
+            'metadata': getattr(doc, 'metadata', str(doc)),
+        }
+    if 'source_documents' in result:
+        result['source_documents'] = [serialize_document(doc) for doc in result['source_documents']]
+    return result
+
+@app.route('/api/upload', methods=['POST'])
+def api_upload():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        file.save(save_path)
+        return jsonify({'message': f'File {filename} uploaded successfully.'}), 200
+    else:
+        return jsonify({'error': 'Invalid file type. Only PDF allowed.'}), 400
 import os
 from dotenv import load_dotenv
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -96,5 +141,6 @@ Answer:
     return new_result
 
 if __name__ == "__main__":
-    result = run_llm("Butter chicken recipe")
+    # Run Flask app in a separate thread if needed, or just run it directly
+    app.run(host="0.0.0.0", port=5000, debug=True)
     
