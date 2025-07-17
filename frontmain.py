@@ -233,6 +233,9 @@ if st.session_state["selected_menu"] == "Previous Chat":
     else:
         st.info("No previous chats yet.")
         
+
+
+        #use INput journey
     # Place the input at the bottom of the chat
     prompt = st.text_input("Prompt", placeholder="Enter your Prompt here...", label_visibility="collapsed")
     
