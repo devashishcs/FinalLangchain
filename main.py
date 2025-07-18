@@ -28,6 +28,22 @@ def api_query():
         result['source_documents'] = [serialize_document(doc) for doc in result['source_documents']]
     return result
 
+@app.route('/api/createdoc', methods=['POST'])
+def api_createdoc():
+    data = request.json
+    content = data.get('content')
+    if not content:
+        return jsonify({'error': 'content is required'}), 400
+
+    # Generate a unique filename using current date and time
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = secure_filename(data.get('filename', f'document_{timestamp}.txt'))
+    save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    with open(save_path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    return jsonify({'message': f'File {filename} created successfully.'}), 200
+
 @app.route('/api/upload', methods=['POST'])
 def api_upload():
     if 'file' not in request.files:
@@ -56,6 +72,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_groq import ChatGroq
 from langchain.schema import HumanMessage, AIMessage
 import glob
+import datetime
 load_dotenv()
 
 # Configuration

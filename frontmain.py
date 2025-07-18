@@ -1,6 +1,8 @@
 import streamlit as st
 from main import run_llm
 import requests
+import os
+from datetime import datetime
 
 # Full purple-themed CSS with enhanced sidebar styling
 st.markdown("""
@@ -280,16 +282,55 @@ elif st.session_state["selected_menu"] == "Document Upload":
     uploaded_file = st.file_uploader("Choose a file", type=["pdf", "docx", "txt"])
     if uploaded_file:
         st.success(f"✅ Successfully uploaded: {uploaded_file.name}")
+        # Send file to backend API
+        api_url = "http://127.0.0.1:5000/api/upload"  # Change to your actual upload endpoint
+        files = {"file": (uploaded_file.name, uploaded_file, uploaded_file.type)}
+        try:
+            response = requests.post(api_url, files=files)
+            response.raise_for_status()
+            result = response.json()
+            st.info(f"Upload result: {result.get('message', 'Success')}")
+        except Exception as e:
+            st.error(f"Upload failed: {e}")
         # Add your document processing logic here
-        
+
+
 elif st.session_state["selected_menu"] == "Editor":
-    st.subheader("✏️ Document Editor")
-    st.text_area("Edit your document here", height=300, placeholder="Start typing your document...")
+    st.subheader("✏️ Document Editor")   
+    # Initialize
+    if "doc_content" not in st.session_state:
+        st.session_state.doc_content = ""
+    
+    doc_content = st.text_area(
+        "Edit your document here",
+        value=st.session_state.doc_content,
+        height=300,
+        placeholder="Start typing your document..."
+    )
+    
     col1, col2 = st.columns(2)
     with col1:
-        st.button("💾 Save Document")
+        if st.button("💾 Save Document"):
+            st.session_state.doc_content = doc_content
+            api_url = "http://127.0.0.1:5000/api/createdoc"  # Change to your actual API endpoint
+            payload = {
+            "content": doc_content
+            }
+            try:
+                response = requests.post(api_url, json=payload)
+                response.raise_for_status()
+                generated_response = response.json()
+                st.info(f"Upload result: {generated_response.get('message', 'Success')}")
+            except Exception as e:
+                generated_response = {
+                    "result": f"Error: {e}"
+                }
+            pass
+    
     with col2:
-        st.button("🔄 Clear All")
+        if st.button("🔄 Clear All"):
+            st.session_state.doc_content = ""
+            st.rerun()
     
 elif st.session_state["selected_menu"] == "About Us":
     st.subheader("ℹ️ About Document Assistant")
